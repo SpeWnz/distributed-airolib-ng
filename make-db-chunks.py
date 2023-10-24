@@ -29,7 +29,7 @@ def splitWordlist(inputPath: str):
 
 def filterWordlist(inputPath: str):
     # grep file -x '.\{A,B\}'
-    com = "grep -x '.\\{8,63\\}' \"" + inputPath + "\" > \"" + TEMP_WORDLIST + "\""
+    com = "grep -a -x '.\\{8,63\\}' \"" + inputPath + "\" > \"" + TEMP_WORDLIST + "\""
     #print(com)
     os.system(com)
 

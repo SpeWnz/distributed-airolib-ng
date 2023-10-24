@@ -223,8 +223,6 @@ def batchChunk(threadID: int,chunk: str):
     # Wait for the process to complete and get the return code
     return_code = process.poll()
 
-    # Print the return code
-    #print("Return Code:", return_code)
 
     thread_infoMessage(threadID, "Batch finished for chunk " + chunk)
 
