@@ -49,6 +49,14 @@
 <p><code>python3 client.py -h</code></p>
 </li>
 
+<li><p>With a browser, navigate to the server IP address to check the current status:</p>
+
+<p>Main page: </p>
+<img src="img/index.png">
+<p>Performance dashboard:</p>
+<img src="img/status.png">
+</li>
+
 </ol>
 
 ## Features
