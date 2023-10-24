@@ -150,6 +150,7 @@ def resetWIPchunks():
 
     removeNullChunks()
 
+    print(CHUNKS_INVENTORY_DICT)
     for key in CHUNKS_INVENTORY_DICT['chunks']:
         if CHUNKS_INVENTORY_DICT['chunks'][key] == 'WIP':
             setChunkState(key, 'TODO')
@@ -249,6 +250,20 @@ def heartbeat():
     }
     
     return jsonify(data)
+
+# method used by the client to determine if there actually is work to do or not
+@app.route('/workAvailable', methods=['GET'])
+def workAvailable():
+    log_clientActivity(request.headers['clientID'], request.remote_addr,  "The client has requested the path /workAvailable")
+
+    CLIENT_CHUNK_REQUEST_LOCK.acquire()
+    result = getTODOChunk()
+    CLIENT_CHUNK_REQUEST_LOCK.release()
+
+    if result == None:
+        return jsonify({'response': False}),404
+    else:
+        return jsonify({'response': True}),200
 
 # Sends a "todo" chunk to a client that requests it.
 # the lock is there to prevent other clients from requesting the same chunk
@@ -396,7 +411,5 @@ if __name__ == '__main__':
     
     
     resetWIPchunks()
-    #resetALLchunks()
-
     
     app.run(host="0.0.0.0",debug=True,port=PORT)

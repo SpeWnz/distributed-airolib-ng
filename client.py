@@ -10,6 +10,7 @@ import termios
 import tty
 
 import ZHOR_Modules.nicePrints as np
+import ZHOR_Modules.argparseUtils as argparseUtils
 import ZHOR_Modules.randUtils as ru
 from common import _VERSION, WORDLIST_CHUNK_SIZE
 
@@ -24,7 +25,9 @@ REQUIRED_ARGUMENTS.add_argument('-p',metavar='"PORT"',type=str,required=True,hel
 REQUIRED_ARGUMENTS.add_argument('-t',metavar='"PORT"',type=int,required=True,help='Threads (parallel airolib-ng instances the client can execute)')
 
 # Argomenti opzionali
-OPTIONAL_ARGUMENTS.add_argument('--limit',metavar='"LIMIT CHUNKS"',type=str,required=False,help='Max number of chunks to batch, after which the client will quit. Cannot be less than the value specified in -t')
+OPTIONAL_ARGUMENTS.add_argument('--limit',metavar='"LIMIT CHUNKS"',type=str,required=False,help='Max number of chunks to batch, after which the client will quit. Cannot be less than the value specified in -t. MUTEX with --cont-poll')
+OPTIONAL_ARGUMENTS.add_argument('--cont-poll',action="store_true",help="\"Continuous polling\" mode. When the client is done, don't quit, wait for the server to come online and with work to do. Ideal if the client is executed as a background service. MUTEX with --limit")
+OPTIONAL_ARGUMENTS.add_argument('--fake',action="store_true",help="(only used in developement) use a fake command instead of the actual airolib-ng command")
 OPTIONAL_ARGUMENTS.add_argument('--debug',action="store_true",help="Debug mode")
 
 args = parser.parse_args()
@@ -41,6 +44,8 @@ STDOUT_LOCK = threading.Lock()                          # lock used specifically
 
 PERFORMANCE_DICTIONARY = {}                             # used to keep track of the performance
 PERFORMANCE_STATUS_UPDATE_INTERVAL = 3                  # frequency (in seconds) at which the current performance is calculated and sent over to the server
+
+POLLING_INTERVAL = 10                                   # frequency (in seconds) at which the client will execute each poll
 
 MAX_CHUNKS_TO_BATCH = 0                                 # how many chunks should the client batch at most
 MAX_CHUNKS_SET = False                                  # global flag used to check wether the user specified a limit or not
@@ -61,11 +66,23 @@ def heartbeat():
     np.infoPrint("Testing connectivity...")
     try:
         r = requests.get(url=SERVER_ADDRESS + "/heartbeat",headers=HEADERS)
-        np.infoPrint("The server is reachable.")
+        np.infoPrint("The server is online.")
         return True
     except Exception as e:
-        np.errorPrint("The server is not reachable.")
+        np.errorPrint("The server is not online.")
         np.debugPrint("Server is not reachable due to exception: " + str(e))
+        return False
+
+# test if there is actually work to do
+def workAvailable():
+    np.infoPrint("Checking if there's work available...")
+    r = requests.get(url=SERVER_ADDRESS + "/workAvailable",headers=HEADERS)
+
+    if(r.status_code == 200):
+        np.infoPrint("There is work available.")
+        return True
+    else:
+        np.infoPrint("There is no work available.")
         return False
 
 # verifies the thread count is valid.
@@ -188,11 +205,13 @@ def batchChunk(threadID: int,chunk: str):
     global PERFORMANCE_DICTIONARY
 
     # Command to be executed
-    command = "{} {} --batch".format(CUSTOM_EXECUTABLE_PATH,chunk)
+    if ('--fake' in sys.argv):
+        # debugging / testing
+        command = "echo [FAKE] Computed 25000 PMK in 48 seconds (520 PMK/s, 225000 in buffer)".format(CUSTOM_EXECUTABLE_PATH,chunk)
+        time.sleep(ru.extractRandomNumber(1, 10))
+    else:
+        command = "{} {} --batch".format(CUSTOM_EXECUTABLE_PATH,chunk)
 
-    # debugging / testing - COMMENT OUT THE FOLLOWING 2 LINES WHEN YOU'RE DONE
-    #command = "echo [FAKE] Computed 25000 PMK in 48 seconds (520 PMK/s, 225000 in buffer)".format(CUSTOM_EXECUTABLE_PATH,chunk)
-    #time.sleep(ru.extractRandomNumber(1, 10))
 
     thread_infoMessage(threadID, "Batch started for chunk " + chunk)
 
@@ -336,16 +355,18 @@ def jobDone():
     np.debugPrint(r.text)
 
 
-if __name__ == '__main__':
-
+# client stuff
+def runClient():
+    global ALL_THREADS_JOINED
     if not heartbeat():
-        exit()
+        return
 
-    threadList = []
+    if not workAvailable():
+        return
 
-    
-    threadCount = checkThreadCount(args.t)
-    
+
+    threadList = []    
+    threadCount = checkThreadCount(args.t)    
     
     if("--limit") in sys.argv:
         MAX_CHUNKS_TO_BATCH = int(args.limit)
@@ -376,3 +397,22 @@ if __name__ == '__main__':
 
     jobDone()
     np.infoPrint("Client job done. ")
+
+if __name__ == '__main__':
+
+    if argparseUtils.checkMutExArgs(sys.argv, ['--cont-poll','--limit']):
+        exit()
+
+
+    # continuous polling
+    if ("--cont-poll" in sys.argv):
+        np.infoPrint("Continuous polling is on. The client will look for work every {} seconds from the specified server.".format(str(POLLING_INTERVAL)))
+
+        while True:
+            runClient()
+            np.infoPrint("Polling again in {} seconds.\n".format(str(POLLING_INTERVAL)))
+            time.sleep(POLLING_INTERVAL)
+
+    # work and quit
+    else:
+        runClient()
