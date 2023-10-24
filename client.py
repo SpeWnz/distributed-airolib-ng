@@ -188,11 +188,11 @@ def batchChunk(threadID: int,chunk: str):
     global PERFORMANCE_DICTIONARY
 
     # Command to be executed
-    #command = "{} {} --batch".format(CUSTOM_EXECUTABLE_PATH,chunk)
+    command = "{} {} --batch".format(CUSTOM_EXECUTABLE_PATH,chunk)
 
     # debugging / testing - COMMENT OUT THE FOLLOWING 2 LINES WHEN YOU'RE DONE
-    command = "echo [FAKE] Computed 25000 PMK in 48 seconds (520 PMK/s, 225000 in buffer)".format(CUSTOM_EXECUTABLE_PATH,chunk)
-    time.sleep(ru.extractRandomNumber(1, 10))
+    #command = "echo [FAKE] Computed 25000 PMK in 48 seconds (520 PMK/s, 225000 in buffer)".format(CUSTOM_EXECUTABLE_PATH,chunk)
+    #time.sleep(ru.extractRandomNumber(1, 10))
 
     thread_infoMessage(threadID, "Batch started for chunk " + chunk)
 
