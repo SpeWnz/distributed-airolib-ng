@@ -1,7 +1,7 @@
 # Distributed Airolib-ng
 ### Airolib-ng with a <i>distributed system</i> approach
 
-<p>Version v201023</p>
+<p>Version v241023</p>
 
 ## What is Airolib-ng ?
 
@@ -63,7 +63,7 @@
 <ul>
 <li>"Safe multithread": The script will prevent you from launching more airolib-ng instances than your core count.</li>
 <li>Batch limit: it is possible to batch only a maximum amout of chunk if specified.</li>
-<li>(TODO) Continuous polling: clients will keep looking for new jobs from the server, never shutting down. Ideal in situations where clients are always online.</li>
+<li>Continuous polling: clients will keep looking for new jobs from the server, never shutting down. Ideal in situations where clients are always online (for example, when clients are executed as a background service).</li>
 <li>(TODO) Aircrack-ng adapter: a script that can ingest all of the db chunks and crack the password.</li>
 <li>(TODO) Keyboard interrupt handling for the client.</li>
 
