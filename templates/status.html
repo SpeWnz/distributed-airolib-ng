@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <script src="{{ url_for('static', filename='performance-stats.js') }}"></script>
+
+    <title>Distributed Airolib-ng</title>
+</head>
+<body>
+    <h1>Status</h1>
+    
+    <div id="overall">
+        <p><b>Overall performance:</b></p>
+    </div>
+
+
+    <p> <b>Connected clients:</b></p>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>Client ID</th>
+                <th>Client IP</th>
+                <th>Performance (PMK/s)</th>
+            </tr>
+        </thead>
+
+
+        <tbody id="data-table-body">
+
+        </tbody>
+    </table>
+      
+
+</body>
+</html>
