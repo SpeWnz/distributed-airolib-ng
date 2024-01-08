@@ -12,14 +12,11 @@ table, th, td{
     font-family: 'Courier New', Courier, monospace;
 }
 
-table tr,td {
+table tr,td,th {
     padding-left: 20px;
     padding-right: 20px;
 }
 
-table tr{
-
-}
 
 .performance-number
 {

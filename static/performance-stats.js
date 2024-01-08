@@ -15,6 +15,29 @@ async function fetchData() {
   
 // Function to create and populate the table with the fetched data
 async function printDataOnScreen() {
+    
+  function createUnorderedList(list) 
+  {
+    // Create an unordered list element
+    const ulElement = document.createElement('ul');
+
+    // Iterate through the list and create list items for each element
+    list.forEach(item => {
+      // Create a list item element
+      const liElement = document.createElement('li');
+      
+      // Set the text content of the list item to the current item in the list
+      liElement.textContent = item;
+      
+      // Append the list item to the unordered list
+      ulElement.appendChild(liElement);
+    });
+
+    // Return the unordered list element
+    return ulElement;
+  }
+  
+  
     const data = await fetchData();
     const table = document.getElementById('data-table-body');
 
@@ -32,7 +55,10 @@ async function printDataOnScreen() {
     p4.textContent = "Unbatched chunks: " + data['todoChunks'];
 
     const p5 = document.createElement('p');
-    p5.textContent = "Total chunks: " + data['totalChunks'];
+    p5.textContent = "WIP chunks: " + data['wipChunks'];
+
+    const p6 = document.createElement('p');
+    p6.textContent = "Total chunks: " + data['totalChunks'];
 
     const container = document.getElementById('overall');
     container.appendChild(p1);
@@ -40,9 +66,10 @@ async function printDataOnScreen() {
     container.appendChild(p3);
     container.appendChild(p4);
     container.appendChild(p5);
+    container.appendChild(p6);
 
     // fill table
-    const clientData = data['clientData'];
+    const clientData = data['clientStatusDictionary'];
     console.log(clientData);
 
     for (const key in clientData)
@@ -54,11 +81,13 @@ async function printDataOnScreen() {
         const cell1 = newRow.insertCell(); // id
         const cell2 = newRow.insertCell(); // ip
         const cell3 = newRow.insertCell(); // perf
+        const cell4 = newRow.insertCell(); // working chunks
 
         // insert data
-        cell1.textContent = key;
+        cell1.textContent = clientData[key]['clientID'];
         cell2.textContent = clientData[key]['ip'];
         cell3.textContent = clientData[key]['performance'];
+        cell4.appendChild(createUnorderedList(clientData[key]['chunks']))
 
         // apply some style
         cell3.classList.add('performance-number');

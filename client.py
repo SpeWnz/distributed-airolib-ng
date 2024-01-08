@@ -73,6 +73,12 @@ def heartbeat():
         np.debugPrint("Server is not reachable due to exception: " + str(e))
         return False
 
+# connects and comunicate that the client is connected and starting to work
+def clientHello():
+    np.debugPrint("Sending client hello to begin working...")
+    r = requests.get(url=SERVER_ADDRESS + "/connect",headers=HEADERS)
+    np.debugPrint("Server response:" + r.text)
+
 # test if there is actually work to do
 def workAvailable():
     np.infoPrint("Checking if there's work available...")
@@ -131,7 +137,6 @@ def checkChunkLimitCount(threadCount: int):
         np.infoPrint("Cannot limit chunk count to a value that's less than 1. Defaulting to " + str(threadCount))
         MAX_CHUNKS_TO_BATCH = threadCount
         return
-
 
 
 
@@ -289,6 +294,8 @@ def threadFunction(threadID: int):
 
             # if a limit has been set, check if you can continue
             if(MAX_CHUNKS_SET == True):
+                
+
                 MAX_CHUNKS_COUNTER_LOCK.acquire()
                 MAX_CHUNKS_COUNTER += 1
                 MAX_CHUNKS_COUNTER_LOCK.release()
@@ -358,11 +365,20 @@ def jobDone():
 # client stuff
 def runClient():
     global ALL_THREADS_JOINED
+    global MAX_CHUNKS_TO_BATCH
+    global MAX_CHUNKS_SET
+    
+    
+    # is the sever actually online and reachable?
     if not heartbeat():
         return
 
+    # is there actually any work to do?
     if not workAvailable():
         return
+
+    # comunicate the start of the working session
+    clientHello()
 
 
     threadList = []    
