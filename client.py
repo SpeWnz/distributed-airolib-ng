@@ -22,7 +22,7 @@ OPTIONAL_ARGUMENTS = parser.add_argument_group("Optional arguments")
 # Argomenti necessari
 REQUIRED_ARGUMENTS.add_argument('-i',metavar='"IP"',type=str,required=True,help='Server IP')
 REQUIRED_ARGUMENTS.add_argument('-p',metavar='"PORT"',type=str,required=True,help='Server port')
-REQUIRED_ARGUMENTS.add_argument('-t',metavar='"PORT"',type=int,required=True,help='Threads (parallel airolib-ng instances the client can execute)')
+REQUIRED_ARGUMENTS.add_argument('-t',metavar='"THREADS"',type=int,required=True,help='Threads (parallel airolib-ng instances the client can execute)')
 
 # Argomenti opzionali
 OPTIONAL_ARGUMENTS.add_argument('--limit',metavar='"LIMIT CHUNKS"',type=str,required=False,help='Max number of chunks to batch, after which the client will quit. Cannot be less than the value specified in -t. MUTEX with --cont-poll')
