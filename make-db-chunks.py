@@ -105,6 +105,13 @@ if (len(sys.argv) != 3):
 wordlistPath = str(sys.argv[1])
 ssidPath = str(sys.argv[2])
 
+# to prevent the user from accidentally switching wordlist and ssid list (it happened...)
+print("\n")
+np.infoPrint("Make sure this is correct:")
+print("Passwords:\r\t\t",wordlistPath)
+print("SSIDs:\r\t\t",ssidPath)
+input("\nPress enter to coninue or quit with CTRL + C")
+
 
 print("Filtering out bad password candidates with grep. This might take a while...")
 filterWordlist(wordlistPath)

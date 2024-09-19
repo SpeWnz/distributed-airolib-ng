@@ -232,7 +232,7 @@ def batchChunk(threadID: int,chunk: str):
             
             # info-print the interesting stuff, debug-print the rest
             if('PMK/s' in output):
-                thread_infoMessage(threadID, output.strip())
+                thread_debugMessage(threadID, output.strip())
 
                 stats = parseProcessOutputString(output.strip())
 
